@@ -27,3 +27,7 @@ Implemented the following structural components:
 - Created `Bamboo.md` (Policy definition)
 - Created `docs/repo-organization.md` (Hygiene Map)
 - Created `docs/ctx-orientation.md` (Orientation Log)
+
+## Knob: PLTRF self-check — Wednesday, June 17, 2026
+
+Added a fourth check to `.github/workflows/pltrf-check.yml` that closes the loop the workflow relocation exposed: it asserts the CI enforcer path cited in `Bamboo.md` and `docs/repo-organization.md` actually resolves on disk, so a future misplacement of the workflow fails the build instead of silently disabling all the checks. Caught and fixed a YAML indentation bug while landing it — the new step's `- name:` was nested inside the prior step's `run:` block, which would have made the whole workflow fail to parse; re-aligned every step to 6-space `- name:` / 8-space `run:`. Updated the header comment from three checks to four. Verified the file parses into five steps (checkout plus four checks).

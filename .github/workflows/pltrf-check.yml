@@ -2,7 +2,7 @@ name: PLTRF Check
 
 # Preventative Long-Term Repo Fragmentation check.
 # Logic over liturgy: this is the file Bamboo.md and ctx-rules.md cite as the
-# enforcer. It performs three real, failable checks on every push and PR.
+# enforcer. It performs four real, failable checks on every push and PR.
 
 on:
   push:
@@ -47,3 +47,15 @@ jobs:
             if [ ! -e "$p" ]; then echo "::error::Map cites missing path: $p"; fail=1; fi
           done
           exit $fail
+
+      - name: Cited CI enforcer exists (self-check)
+        run: |
+          # Canon (Bamboo.md, repo-organization.md) names this workflow as the
+          # enforcer. If that citation drifts from where the file actually lives,
+          # the whole check silently stops running. Assert the cited path exists.
+          cited='.github/workflows/pltrf-check.yml'
+          if grep -rq "$cited" Bamboo.md docs/repo-organization.md && [ ! -f "$cited" ]; then
+            echo "::error::Canon cites $cited but it is not at that path."
+            exit 1
+          fi
+          echo "OK: cited CI enforcer resolves."
