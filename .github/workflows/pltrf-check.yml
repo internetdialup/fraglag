@@ -1,8 +1,9 @@
 name: PLTRF Check
 
+
 # Preventative Long-Term Repo Fragmentation check.
 # Logic over liturgy: this is the file Bamboo.md and ctx-rules.md cite as the
-# enforcer. It performs four real, failable checks on every push and PR.
+# enforcer. It performs five real, failable checks on every push and PR.
 
 on:
   push:
@@ -59,3 +60,28 @@ jobs:
             exit 1
           fi
           echo "OK: cited CI enforcer resolves."
+          - name: Knobs in descending date order
+        run: |
+          python3 - <<'PY'
+          import re, sys
+          from datetime import datetime
+          text = open("docs/ctx-orientation.md", encoding="utf-8").read()
+          headings = re.findall(r'^##\s+Knob:.*$', text, flags=re.MULTILINE)
+          dates = []
+          for h in headings:
+              raw = h.rsplit("—", 1)[-1].strip()
+              try:
+                  dates.append((datetime.strptime(raw, "%A, %B %d, %Y"), h.strip()))
+              except ValueError:
+                  print(f"::error::Unparseable Knob date in heading: {h}"); sys.exit(1)
+          if not dates:
+              print("::error::No Knob headings found."); sys.exit(1)
+          bad = False
+          for (dp, hp), (dc, hc) in zip(dates, dates[1:]):
+              if dc > dp:
+                  print(f"::error::Knob out of order: '{hc}' ({dc.date()}) below '{hp}' ({dp.date()}).")
+                  bad = True
+          if bad:
+              sys.exit(1)
+          print(f"OK: {len(dates)} Knobs in descending order.")
+          PY

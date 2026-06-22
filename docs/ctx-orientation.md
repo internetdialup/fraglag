@@ -4,6 +4,18 @@ The running log of Knobs (state transitions) for the `fraglag` repository. Newes
 
 ---
 
+## Knob: Knob-order CI guard — Sunday, June 21, 2026
+
+Added a fifth check to `.github/workflows/pltrf-check.yml` that enforces this log's own "newest on top" rule: it parses every `## Knob:` heading date and fails the build if any entry sits above an older one. Prompted by the previous bump landing the PLTRF self-check Knob at the bottom of the file instead of the top — the One-Home check counts files but never policed order, so the drift slipped through CI. Reordered the log to proper descending order in this same commit, since the new check fails otherwise. Verified both directions: passes on the corrected log, and flags an out-of-order entry with the offending heading and both dates.
+
+---
+
+## Knob: PLTRF self-check — Wednesday, June 17, 2026
+
+Added a fourth check to `.github/workflows/pltrf-check.yml` that closes the loop the workflow relocation exposed: it asserts the CI enforcer path cited in `Bamboo.md` and `docs/repo-organization.md` actually resolves on disk, so a future misplacement of the workflow fails the build instead of silently disabling all the checks. Caught and fixed a YAML indentation bug while landing it — the new step's `- name:` was nested inside the prior step's `run:` block, which would have made the whole workflow fail to parse; re-aligned every step to 6-space `- name:` / 8-space `run:`. Updated the header comment from three checks to four. Verified the file parses into five steps (checkout plus four checks).
+
+---
+
 ## Knob: Drift reconciliation — Wednesday, June 17, 2026
 
 Reconciled the doc layer against the actual tree after a cold-start audit found it describing a repo that doesn't exist. The package was being called `fraglog` in five spots across `AGENT.md`, `docs/repo-organization.md`, and this log — it has always been `fraglag`. Flipped all five. The map in `docs/repo-organization.md` claimed `models.py`, `export.py`, `pyproject.toml`, and a `tests/` suite that were never built; rewrote the map to the four files that exist (`__init__.py`, `cli.py`, `parser.py`, `patterns.py`), added the missing `demo.py` and the six previously-unlisted `behavior/` docs, and moved the never-built files into an explicit "planned, intentionally absent" note so intent stays on record without phantom map entries.
@@ -27,7 +39,3 @@ Implemented the following structural components:
 - Created `Bamboo.md` (Policy definition)
 - Created `docs/repo-organization.md` (Hygiene Map)
 - Created `docs/ctx-orientation.md` (Orientation Log)
-
-## Knob: PLTRF self-check — Wednesday, June 17, 2026
-
-Added a fourth check to `.github/workflows/pltrf-check.yml` that closes the loop the workflow relocation exposed: it asserts the CI enforcer path cited in `Bamboo.md` and `docs/repo-organization.md` actually resolves on disk, so a future misplacement of the workflow fails the build instead of silently disabling all the checks. Caught and fixed a YAML indentation bug while landing it — the new step's `- name:` was nested inside the prior step's `run:` block, which would have made the whole workflow fail to parse; re-aligned every step to 6-space `- name:` / 8-space `run:`. Updated the header comment from three checks to four. Verified the file parses into five steps (checkout plus four checks).
