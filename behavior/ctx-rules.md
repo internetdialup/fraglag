@@ -39,6 +39,18 @@ Every Knob entry in the orientation log must contain:
 2. **Narrative**: 1-2 paragraphs of "Why" and "What."
 3. **Cross-References**: Binary links to changed files or previous Knobs.
 
+## 4b. Rollover & Ordering (the single orientation log)
+
+The Knob log lives only at `docs/ctx-orientation.md`. Read it in reverse
+chronological order — newest Knob at the top, active Knob first. The current
+Knob plus the last three stay hot in this file.
+
+When the per-Knob entries cross **5000 characters**, spawn
+`docs/ctx-ori-summary-2.md` and keep writing in the main file; older entries
+migrate to the numbered summary as cold storage. Continue with `-3`, `-4`,
+`-5` as the repo grows. There is no second live log — summaries are cold
+archives, not parallel orientation files.
+
 ## 5. Hot/Warm/Cold Tiering
 
 - **Hot**: Active Knob and current directives. Stays in context.

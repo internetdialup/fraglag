@@ -1,0 +1,49 @@
+name: PLTRF Check
+
+# Preventative Long-Term Repo Fragmentation check.
+# Logic over liturgy: this is the file Bamboo.md and ctx-rules.md cite as the
+# enforcer. It performs three real, failable checks on every push and PR.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  pltrf:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: No stale package name (fraglog)
+        run: |
+          # The orientation log is the historical record and may reference the
+          # old name when documenting the rename; exclude it from the scan.
+          hits=$(grep -rn --include='*.md' --include='*.py' 'fraglog' . \
+                 | grep -v 'docs/ctx-orientation.md' || true)
+          if [ -n "$hits" ]; then
+            echo "$hits"
+            echo "::error::Found stale 'fraglog' references. Package is 'fraglag'."
+            exit 1
+          fi
+          echo "OK: no live 'fraglog' references."
+
+      - name: Single orientation log (One Home)
+        run: |
+          count=$(find . -name 'ctx-orientation.md' -not -path './.git/*' | wc -l)
+          if [ "$count" -ne 1 ]; then
+            echo "::error::Expected exactly one ctx-orientation.md, found $count."
+            find . -name 'ctx-orientation.md' -not -path './.git/*'
+            exit 1
+          fi
+          echo "OK: exactly one orientation log."
+
+      - name: Map references resolve
+        run: |
+          fail=0
+          for p in fraglag/__init__.py fraglag/cli.py fraglag/parser.py \
+                   fraglag/patterns.py demo.py examples/match.txt \
+                   docs/ctx-orientation.md docs/repo-organization.md; do
+            if [ ! -e "$p" ]; then echo "::error::Map cites missing path: $p"; fail=1; fi
+          done
+          exit $fail
