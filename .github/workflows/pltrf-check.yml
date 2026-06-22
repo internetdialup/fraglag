@@ -1,6 +1,5 @@
 name: PLTRF Check
 
-
 # Preventative Long-Term Repo Fragmentation check.
 # Logic over liturgy: this is the file Bamboo.md and ctx-rules.md cite as the
 # enforcer. It performs five real, failable checks on every push and PR.
@@ -60,7 +59,8 @@ jobs:
             exit 1
           fi
           echo "OK: cited CI enforcer resolves."
-          - name: Knobs in descending date order
+
+      - name: Knobs in descending date order
         run: |
           python3 - <<'PY'
           import re, sys
